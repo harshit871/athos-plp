@@ -11,7 +11,6 @@ const Pagination = ({ pagination }: PaginationProps) => {
   const [, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 
   if (!pagination || pagination.totalPages <= 1) return null;
-
   const { currentPage, totalPages } = pagination;
 
   const handlePageChange = (newPage: number) => {

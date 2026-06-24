@@ -67,10 +67,9 @@ const ProductResults = ({
       ))}
       {isInfiniteScroll && isFetching && (
         <>
-          <ProductCardSkeleton viewMode={viewMode} />
-          <ProductCardSkeleton viewMode={viewMode} />
-          <ProductCardSkeleton viewMode={viewMode} />
-          <ProductCardSkeleton viewMode={viewMode} />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <ProductCardSkeleton key={index} viewMode={viewMode} />
+          ))}
         </>
       )}
     </div>

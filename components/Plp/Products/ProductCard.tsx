@@ -16,7 +16,6 @@ const ProductCard = React.memo(({ product, viewMode = "grid" }: ProductCardProps
   const { name, imageUrl, thumbnailImageUrl, brand, price, msrp, on_sale } = product;
   const { cart, addToCart, updateQuantity } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const numericPrice = parseFloat(price) || 0;
   const numericMsrp = parseFloat(msrp) || 0;
   const isOnSale = on_sale?.[0] === "Yes" || numericMsrp > numericPrice;
