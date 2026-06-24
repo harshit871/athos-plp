@@ -1,86 +1,71 @@
-# Searchspring Product Listing Page (PLP)
+# Athos PLP
 
-A production-quality Product Listing Page (PLP) built in Next.js (Pages Router) featuring real-time faceted search, debounced text search, URL state persistence, persistent shopping cart actions, and high-performance caching.
-
----
-
-## 1. Tech Stack Choices
-
-* **Core Framework:** Next.js 13.5 (Pages Router) with TypeScript & React 18.
-* **Server State & Caching:** `@tanstack/react-query` (TanStack Query v5) for request caching, automatic background fetching, and preventing race conditions.
-* **URL State Management:** `nuqs` (formerly `next-usequerystate`) to synchronize the search query, pagination, and sorting directly to browser URL parameters.
-* **Styling & Components:** Tailwind CSS (v4) with custom components leveraging Radix UI primitives and Lucide React icons.
+Next.js (Pages Router) Product Listing Page integrating Searchspring Search API.
 
 ---
 
-## 2. Architecture Overview
+## Tech Stack
 
-```txt
-athos-plp/
-├── components/
-│   ├── ui/               # Reusable UI primitives (Button, Card, Input)
-│   └── Plp/
-│       ├── Header.tsx    # Sticky header with cart badge icon
-│       ├── Filters/      # Facet accordion sidebar with search and filter locks
-│       └── Products/     # Product grid, searchbar, sort dropdown, and pagination
-├── context/
-│   └── cart-context.tsx  # Global state manager for local storage-persisted cart
-├── hooks/
-│   ├── use-debounce.ts   # Custom hook for search-typing delay
-│   └── use-plp.ts        # Core controller: fetches data, syncs URL params, and manages infinite scroll accumulation
-├── lib/
-│   ├── utils.ts          # Styling class-name merger helpers
-│   └── filters.ts        # Parses active filters from the URL query strings
-├── services/
-│   └── searchspring.ts   # Client wrapper for the Searchspring Search API
-├── pages/
-│   ├── _app.tsx          # Query Client and Cart Provider mount wrapper
-│   └── index.tsx         # Main entry point rendering the PLP view
-├── types.ts              # TypeScript definitions for facets, products, pagination
-└── implementation.md     # Phase checklist and requirements
+- **Core:** Next.js 13.5 (Pages Router), React 18, TypeScript
+- **State & Caching:** TanStack Query v5
+- **URL State:** `nuqs` (synchronizes search, pagination, sort, and filters to URL)
+- **Styling:** Tailwind CSS v4, Radix UI Primitives, Lucide React
+
+---
+
+## Architecture
+
+- **`hooks/use-plp.ts`**: Central data controller. Parses URL params, fetches data via TanStack Query, and manages infinite scroll accumulation.
+- **`components/Plp/Filters/`**: Facet rendering, dynamic search within facets, and URL sync.
+- **`components/Plp/Products/`**: Product grid layout, SearchBar, Sorting, Pagination, and View mode toggle.
+- **`context/cart-context.tsx`**: Local storage-based cart state.
+- **`services/searchspring.ts`**: API wrapper logic.
+
+---
+
+## Setup
+
+```bash
+npm install
+npm run dev
+# Open http://localhost:3000
 ```
 
 ---
 
-## 3. Setup Instructions
+## Developer Notes / Assumptions
 
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Run in Development Mode:**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-3. **Production Build & Verification:**
-   ```bash
-   npm run build
-   ```
+- **URL as Source of Truth:** Filters, sort, and search query are driven strictly by the URL (managed via `nuqs`).
+- **Pagination vs Infinite Scroll:** Both are implemented. Standard pagination updates the `page` URL param. Infinite Scroll accumulates results in local state within `use-plp.ts`.
+- **Loading States:** I implemented full skeleton grids for all loading states in standard pagination. For Infinite Scroll, I append skeletons to the bottom of the list.
+- **Filter Locking:** To prevent conflicting category requests, category-related facets are locked (`pointer-events-none`) during background fetches.
+- **Client-Side Cart:** Cart state lives in `localStorage`.
 
 ---
 
-## 4. Tradeoffs / Assumptions
+## Performance
 
-* **Client-Side Cart:** The cart is maintained on the client using `localStorage`. SSR hydration warnings are prevented by deferring state synchronization until after the client mounts (`useEffect` inside the `CartProvider`).
-* **Infinite Scroll vs Pagination:** Both are supported. When Infinite Scroll is enabled, `use-plp.ts` accumulates product results in local state. Standard pagination relies purely on the URL `page` parameter.
-* **Loading States (Skeletons):** Full skeleton grids are shown on the initial load and when executing a *new* search or filter query. Standard page changes use a subtle 50% opacity transition to avoid layout shift. Infinite scroll appends skeleton cards at the bottom.
-* **Localized Filter Locking:** To prevent users from selecting conflicting sub-category facets while a fetch is in progress, only the category-related facets are locked (`pointer-events-none opacity-50`). Other facets remain interactive.
-
----
-
-## 5. Performance Considerations
-
-* **Query Caching:** TanStack Query is configured with `staleTime: 5 mins` and `gcTime: 10 mins`. Navigating back and forth or toggling the same checkbox works instantly by serving cached data.
-* **Memoization:** The `ProductCard` component is wrapped in `React.memo` to skip redundant reconciliation when unrelated PLP elements (like the filter drawer) update.
-* **Refetch Persistence:** The hook configures `placeholderData: keepPreviousData` to keep current facets visible and prevent layout layout flashes when query keys shift.
+- **Caching:** TanStack Query caches responses (`staleTime: 5 mins`, `gcTime: 10 mins`) for immediate UI updates when reverting to previous states.
+- **Memoization:** `ProductCard` uses `React.memo` to avoid re-renders when parent states (like mobile menu toggles) change.
+- **Placeholder Data:** Query uses `placeholderData: keepPreviousData` to prevent UI layout shift while new data fetches.
 
 ---
 
-## 6. Future Improvements
+## Future Improvements
 
-* **Cart Drawer UI:** Add a slide-out panel to view, modify quantities, and clear items from the cart.
-* **SSR Prefetching:** Prefetch the initial PLP query server-side inside `getServerSideProps` to serve indexable SEO markup out-of-the-box.
-* **E2E Playwright Tests:** Implement automated visual and functional testing for desktop hover interactions, pagination clamping, and filter selections.
+- Autocomplete, Search History
+
+---
+
+## Testing
+
+I have implemented integration tests using **Jest** and **React Testing Library** to cover the core PLP flows:
+
+- **Pagination Flow**: Verifies that page changes update the URL correctly.
+- **Filter Flow**: Verifies that selecting a facet updates the URL parameters.
+
+Run the test suite using:
+
+```bash
+npm run test
+```

@@ -24,7 +24,7 @@ const Pagination = ({ pagination }: PaginationProps) => {
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const delta = 1; // Range around current page
+    const delta = 1;
 
     for (let i = 1; i <= totalPages; i++) {
       if (

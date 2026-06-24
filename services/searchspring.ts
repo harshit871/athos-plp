@@ -26,7 +26,6 @@ export async function searchProducts(
   if (params.page) {
     url.searchParams.append("page", params.page.toString());
   }
-  
 
   if (params.sort) {
     const [field, direction] = params.sort.split("-");
