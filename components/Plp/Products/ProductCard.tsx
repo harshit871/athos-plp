@@ -9,9 +9,10 @@ import ProductModal from "./ProductModal";
 
 interface ProductCardProps {
   product: Product;
+  viewMode?: "grid" | "list";
 }
 
-const ProductCard = React.memo(({ product }: ProductCardProps) => {
+const ProductCard = React.memo(({ product, viewMode = "grid" }: ProductCardProps) => {
   const { name, imageUrl, thumbnailImageUrl, brand, price, msrp, on_sale } = product;
   const { cart, addToCart, updateQuantity } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,10 +28,18 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
   return (
     <>
       <Card
-        className="group relative flex cursor-pointer flex-col overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-lg"
+        className={`group relative flex cursor-pointer overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-lg ${
+          viewMode === "list" ? "flex-row sm:h-48" : "flex-col"
+        }`}
         onClick={() => setIsModalOpen(true)}
       >
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-xl bg-slate-100">
+        <div
+          className={`relative bg-slate-100 overflow-hidden shrink-0 ${
+            viewMode === "list"
+              ? "w-32 sm:w-48 aspect-square rounded-l-xl"
+              : "aspect-[4/5] w-full rounded-t-xl"
+          }`}
+        >
           <Image
             src={imageUrl || thumbnailImageUrl}
             alt={name}
@@ -44,7 +53,11 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             </div>
           )}
         </div>
-        <CardContent className="flex flex-col flex-1 gap-1 p-3">
+        <CardContent
+          className={`flex flex-1 gap-1 p-3 ${
+            viewMode === "list" ? "flex-col justify-center sm:p-5" : "flex-col"
+          }`}
+        >
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
             {brand}
           </span>
@@ -68,7 +81,11 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             )}
           </div>
 
-          <div className="mt-auto overflow-hidden">
+          <div
+            className={`mt-auto overflow-hidden ${
+              viewMode === "list" ? "pt-3 max-w-xs" : ""
+            }`}
+          >
             {isAdded ? (
               <div className="flex h-8 w-full items-center justify-between rounded-lg border border-border bg-muted/20">
                 <Button

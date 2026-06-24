@@ -21,7 +21,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load initial cart state from localStorage
+
   useEffect(() => {
     const stored = localStorage.getItem("athos_cart");
     if (stored) {
@@ -34,7 +34,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsInitialized(true);
   }, []);
 
-  // Persist cart changes to localStorage once initialized
+
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem("athos_cart", JSON.stringify(cart));
@@ -60,7 +60,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existingItem = prevCart.find((item) => item.product.id === productId);
       if (!existingItem) return prevCart;
 
-      // Avoid rendering/write updates if the target quantity is identical
+
       if (existingItem.quantity === quantity) return prevCart;
 
       if (quantity <= 0) {

@@ -7,7 +7,7 @@ import type { Facet } from "@/types";
 
 interface FiltersProps {
   facets: Facet[];
-  // true only on the very first load — no cached data yet
+
   isLoading: boolean;
   isFetching: boolean;
   activeFilters: Record<string, string[]>;
@@ -18,32 +18,32 @@ const DISPLAY_LIMIT = 5;
 const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps) => {
   const router = useRouter();
 
-  // Expand/collapse per facet — all open by default
+
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  // Show-more per facet
+
   const [showMore, setShowMore] = useState<Record<string, boolean>>({});
 
-  // Per-facet search filter
+
   const [facetSearch, setFacetSearch] = useState<Record<string, string>>({});
 
-  // ─── Helpers ────────────────────────────────────────────────────────────────
+
 
   const hasActiveFilters = useMemo(
     () => Object.keys(activeFilters).length > 0,
     [activeFilters]
   );
 
-  // Read the current raw query as an array, whether Next stored it as string or string[]
+
   const getQueryArray = (key: string): string[] => {
     const val = router.query[key];
     if (!val) return [];
     return Array.isArray(val) ? val : [val];
   };
 
-  // Push updated query keeping existing non-filter params intact
+
   const pushQuery = (next: Record<string, string | string[] | undefined>) => {
-    // Start from only non-filter params + keep q, sort, etc.
+
     const base: Record<string, string | string[]> = {};
     Object.entries(router.query).forEach(([k, v]) => {
       if (!k.startsWith("filter.") && k !== "page" && v !== undefined) {
@@ -51,16 +51,16 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
       }
     });
 
-    // Merge active filters (that weren't removed) back in
+
     Object.entries(activeFilters).forEach(([k, vals]) => {
       const key = `filter.${k}`;
       if (!(key in next)) {
-        // Preserve unchanged filters
+
         if (vals.length > 0) base[key] = vals.length === 1 ? vals[0] : vals;
       }
     });
 
-    // Apply the new/changed filter params
+
     Object.entries(next).forEach(([k, v]) => {
       if (v === undefined || (Array.isArray(v) && v.length === 0)) {
         delete base[k];
@@ -75,7 +75,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     });
   };
 
-  // Toggle a value-type filter (brand, color, category…)
+
   const toggleValue = (field: string, value: string) => {
     const key = `filter.${field}`;
     const current = getQueryArray(key);
@@ -86,7 +86,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     pushQuery({ [key]: next.length > 0 ? next : undefined });
   };
 
-  // Toggle a price-range filter (price.low / price.high)
+
   const toggleRange = (field: string, low: string, high: string) => {
     const lowKey = `filter.${field}.low`;
     const highKey = `filter.${field}.high`;
@@ -100,7 +100,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     }
   };
 
-  // Clear a single filter pill
+
   const clearPill = (filterKey: string, value: string) => {
     if (filterKey.endsWith(".low") || filterKey.endsWith(".high")) {
       const base = filterKey.replace(/\.(low|high)$/, "");
@@ -116,7 +116,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     }
   };
 
-  // Clear every filter at once
+
   const clearAll = () => {
     const base: Record<string, string | string[]> = {};
     Object.entries(router.query).forEach(([k, v]) => {
@@ -130,7 +130,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     });
   };
 
-  // ─── Active filter pills ─────────────────────────────────────────────────────
+
   const pills = useMemo(() => {
     const result: { key: string; value: string; label: string }[] = [];
 
@@ -155,7 +155,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     return result;
   }, [activeFilters, facets]);
 
-  // ─── Skeleton — only on very first load (no facets yet) ──────────────────────
+
   if (isLoading && facets.length === 0) {
     return (
       <div className="space-y-6" aria-busy="true">
@@ -182,10 +182,10 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
     );
   }
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className="space-y-0 transition-opacity duration-200">
-      {/* Header */}
+
       <div className="flex items-center justify-between pb-4 mb-2 border-b border-border">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-foreground" aria-hidden="true" />
@@ -205,7 +205,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
         )}
       </div>
 
-      {/* Active filter pills */}
+
       {pills.length > 0 && (
         <div className="flex flex-wrap gap-1.5 pb-4 mb-2 border-b border-border">
           {pills.map((pill) => (
@@ -221,7 +221,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
         </div>
       )}
 
-      {/* Facet sections */}
+
       <div className="divide-y divide-border">
         {facets.map((facet) => {
           const isCollapsed = !!collapsed[facet.field];
@@ -246,7 +246,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                 isDisabled ? "pointer-events-none opacity-50" : ""
               }`}
             >
-              {/* Facet header / toggle */}
+
               <button
                 type="button"
                 onClick={() =>
@@ -265,7 +265,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
 
               {!isCollapsed && (
                 <div className="mt-3 space-y-2">
-                  {/* Search box — only for large facet lists */}
+
                   {facet.values.length > 10 && (
                     <div className="relative mb-2">
                       <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -284,7 +284,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                     </div>
                   )}
 
-                  {/* Values */}
+
                   <div className="space-y-2">
                     {displayedValues.map((val) => {
                       const isPriceRange = val.type === "range" || facet.field === "price";
@@ -335,7 +335,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                         );
                       }
 
-                      // Standard value filter
+
                       const checked =
                         Array.isArray(activeFilters[facet.field])
                           ? activeFilters[facet.field].includes(val.value)
@@ -385,7 +385,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                     )}
                   </div>
 
-                  {/* Show more / less */}
+
                   {hasMore && (
                     <button
                       type="button"

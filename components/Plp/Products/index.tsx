@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import SearchBar from "@/components/Plp/Products/SearchBar";
 import ProductResults from "@/components/Plp/Products/ProductResults";
 import SortDropdown from "@/components/Plp/Products/SortDropdown";
 import Pagination from "@/components/Plp/Products/Pagination";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, LayoutGrid, List } from "lucide-react";
 import type { SearchResponse, Product } from "@/types";
 
 interface ProductsProps {
@@ -37,6 +37,19 @@ const Products = ({
   hasMore,
 }: ProductsProps) => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("athos_view_mode");
+    if (saved === "grid" || saved === "list") {
+      setViewMode(saved);
+    }
+  }, []);
+
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("athos_view_mode", mode);
+  };
 
   useEffect(() => {
     if (!isInfiniteScroll || !hasMore || isFetching) return;
@@ -47,7 +60,7 @@ const Products = ({
           loadNextPage();
         }
       },
-      { rootMargin: "200px" }, // Load next page slightly before reaching the bottom
+      { rootMargin: "200px" },
     );
 
     const currentRef = loadMoreRef.current;
@@ -69,9 +82,8 @@ const Products = ({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Toolbar — search + sort + mobile filter trigger */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="w-full sm:max-w-md">
+        <div className="w-full sm:max-w-sm">
           <SearchBar />
         </div>
 
@@ -83,7 +95,6 @@ const Products = ({
               </span>
             )}
             <div className="flex flex-wrap items-center justify-end gap-3 sm:gap-4">
-              {/* Infinite Scroll Toggle */}
               <div className="flex items-center gap-2 pr-1 select-none">
                 <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
                   Infinite Scroll
@@ -109,7 +120,31 @@ const Products = ({
                 </button>
               </div>
 
-              {/* Only visible below lg breakpoint */}
+              <div className="hidden sm:flex bg-muted p-0.5 rounded-lg border border-border items-center">
+                <button
+                  onClick={() => handleViewModeChange("grid")}
+                  className={`p-1.5 rounded-md cursor-pointer transition-all ${
+                    viewMode === "grid"
+                      ? "bg-green-300 shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                  }`}
+                  aria-label="Grid View"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleViewModeChange("list")}
+                  className={`p-1.5 rounded-md cursor-pointer transition-all ${
+                    viewMode === "list"
+                      ? "bg-green-300 shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                  }`}
+                  aria-label="List View"
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
+
               <Button
                 variant="outline"
                 onClick={onOpenFilters}
@@ -125,27 +160,15 @@ const Products = ({
         )}
       </div>
 
-      {/*
-        Apply a subtle opacity transition while a background refetch runs
-        (filter/sort/page change). isLoading is true only on the very first load
-        and shows the full skeleton via ProductResults. isFetching covers both.
-        In Infinite Scroll mode, we keep the existing cards at full opacity
-        and append skeleton loaders at the bottom instead.
-      */}
-      <div
-        className={
-          !isInfiniteScroll && isFetching && !isLoading && !isFetchingNewQuery
-            ? "transition-opacity duration-200 opacity-50"
-            : ""
-        }
-      >
+      <div className="">
         <ProductResults
           products={isInfiniteScroll ? infiniteProducts : data?.results}
-          isLoading={isLoading || isFetchingNewQuery}
+          isLoading={isLoading || isFetchingNewQuery || (isFetching && !isInfiniteScroll)}
           isError={isError}
           refetch={refetch}
           isInfiniteScroll={isInfiniteScroll}
           isFetching={isFetching}
+          viewMode={viewMode}
         />
       </div>
 

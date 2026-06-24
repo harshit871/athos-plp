@@ -9,7 +9,7 @@ import type { SearchResponse, Product } from "@/types";
 export function usePlp() {
   const router = useRouter();
 
-  // URL state query parameters managed by nuqs
+
   const [q] = useQueryState("q", parseAsString.withDefault(""));
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [sort] = useQueryState("sort", parseAsString.withDefault(""));
@@ -18,7 +18,7 @@ export function usePlp() {
   const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
   const [lastSort, setLastSort] = useState(sort);
 
-  // Load user preference for infinite scroll on mount
+
   useEffect(() => {
     const saved = localStorage.getItem("athos_infinite_scroll");
     if (saved) {
@@ -31,7 +31,7 @@ export function usePlp() {
     localStorage.setItem("athos_infinite_scroll", String(val));
   };
 
-  // Reset page to 1 on sort change
+
   useEffect(() => {
     if (sort !== lastSort) {
       setPage(1);
@@ -39,13 +39,13 @@ export function usePlp() {
     }
   }, [sort, lastSort, setPage]);
 
-  // Dynamic filters parsed from router query (parameters prefixed with "filter.")
+
   const filters = useMemo(() => {
     if (!router.isReady) return {};
     return getActiveFilters(router.query);
   }, [router.isReady, router.query]);
 
-  // Main search query fetch
+
   const queryResult = useQuery<SearchResponse>({
     queryKey: ["products", { q, page, sort, filters }],
     queryFn: ({ signal }) =>
@@ -64,9 +64,7 @@ export function usePlp() {
     gcTime: 1000 * 60 * 10,   // Keep cache in memory for 10 minutes
   });
 
-  // Keep pagination URL state in sync with the actual API response page.
-  // E.g. if page=10 is in the URL, but there are only 6 pages of results,
-  // this effect automatically corrects the URL parameter back to 6.
+
   const apiCurrentPage = queryResult.data?.pagination?.currentPage;
   const apiTotalPages = queryResult.data?.pagination?.totalPages;
   const totalPages = apiTotalPages ?? 1;
@@ -87,7 +85,7 @@ export function usePlp() {
     }
   }, [router.isReady, apiCurrentPage, apiTotalPages, page, setPage, isPlaceholderData]);
 
-  // Accumulate products for infinite scroll
+
   useEffect(() => {
     if (!queryResult.data || isPlaceholderData) return;
 
@@ -98,7 +96,7 @@ export function usePlp() {
       setAccumulatedProducts(newResults);
     } else {
       setAccumulatedProducts((prev) => {
-        // Avoid duplicates
+
         const existingIds = new Set(prev.map((p) => p.id));
         const filteredNew = newResults.filter((p) => !existingIds.has(p.id));
         return [...prev, ...filteredNew];

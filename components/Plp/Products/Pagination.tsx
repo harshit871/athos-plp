@@ -21,7 +21,7 @@ const Pagination = ({ pagination }: PaginationProps) => {
     }
   };
 
-  // Generate page numbers to display with ellipses
+
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const delta = 1; // Range around current page

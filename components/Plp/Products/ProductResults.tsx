@@ -10,6 +10,7 @@ interface ProductResultsProps {
   refetch: () => void;
   isInfiniteScroll?: boolean;
   isFetching?: boolean;
+  viewMode?: "grid" | "list";
 }
 
 const ProductResults = ({
@@ -19,9 +20,10 @@ const ProductResults = ({
   refetch,
   isInfiniteScroll = false,
   isFetching = false,
+  viewMode = "grid",
 }: ProductResultsProps) => {
   if (isLoading) {
-    return <ProductGridSkeleton />;
+    return <ProductGridSkeleton viewMode={viewMode} />;
   }
 
   if (isError) {
@@ -53,16 +55,22 @@ const ProductResults = ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+    <div
+      className={
+        viewMode === "list"
+          ? "flex flex-col gap-4"
+          : "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
+      }
+    >
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} viewMode={viewMode} />
       ))}
       {isInfiniteScroll && isFetching && (
         <>
-          <ProductCardSkeleton />
-          <ProductCardSkeleton />
-          <ProductCardSkeleton />
-          <ProductCardSkeleton />
+          <ProductCardSkeleton viewMode={viewMode} />
+          <ProductCardSkeleton viewMode={viewMode} />
+          <ProductCardSkeleton viewMode={viewMode} />
+          <ProductCardSkeleton viewMode={viewMode} />
         </>
       )}
     </div>

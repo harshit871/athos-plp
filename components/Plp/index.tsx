@@ -29,7 +29,7 @@ const Plp = () => {
     setIsMounted(true);
   }, []);
 
-  // Close the mobile drawer whenever a shallow navigation completes (filter click)
+
   useEffect(() => {
     const handleRouteChange = () => setIsMobileFiltersOpen(false);
     router.events.on("routeChangeComplete", handleRouteChange);
@@ -43,14 +43,10 @@ const Plp = () => {
       <Header />
 
       <div className="flex flex-1 w-full">
-        {/* Desktop sidebar */}
+
         <aside className="hidden w-72 shrink-0 border-r border-border bg-card lg:block" aria-label="Filters Sidebar">
           <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
-            {/*
-              Pass isLoading (first-load only) to Filters — the skeleton shows only
-              when there are no cached facets yet. During refetches the sidebar
-              stays intact so accordion state is preserved.
-            */}
+
             <Filters
               facets={data?.facets ?? []}
               isLoading={initialLoading}
@@ -60,14 +56,9 @@ const Plp = () => {
           </div>
         </aside>
 
-        {/* Main content */}
+
         <main className="flex-1 min-w-0 p-6 lg:p-8">
-          {/*
-            isFetching covers both first-load and background refetches.
-            isLoading is true only when there is no cached data at all.
-            Products uses isFetching for a subtle opacity transition on the grid
-            so the skeleton shows only on the very first render.
-          */}
+
           <Products
             data={data}
             isLoading={initialLoading}
@@ -85,16 +76,16 @@ const Plp = () => {
         </main>
       </div>
 
-      {/* Mobile filter drawer */}
+
       {isMobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
+
           <div
             className="absolute inset-0 bg-white/70 backdrop-blur-sm"
             onClick={() => setIsMobileFiltersOpen(false)}
             aria-hidden="true"
           />
-          {/* Slide-in panel */}
+
           <div className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col bg-card shadow-2xl">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <span className="text-sm font-bold uppercase tracking-wider">Filters</span>

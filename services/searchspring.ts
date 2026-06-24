@@ -27,7 +27,7 @@ export async function searchProducts(
     url.searchParams.append("page", params.page.toString());
   }
   
-  // Example sorting: "price-desc" -> "sort.price=desc"
+
   if (params.sort) {
     const [field, direction] = params.sort.split("-");
     if (field && direction) {

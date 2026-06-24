@@ -14,7 +14,7 @@ interface ProductModalProps {
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const { cart, addToCart, updateQuantity } = useCart();
 
-  // Prevent body scrolling when the modal is open
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -40,21 +40,21 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+
       <div
         className="absolute inset-0 bg-white/75 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal Container */}
+
       <div
         className="relative flex w-full max-w-2xl transform flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl transition-all duration-300 animate-in zoom-in-95 md:flex-row"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        {/* Close Button */}
+
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-10 rounded-full border border-border bg-card/85 p-2 text-muted-foreground transition-all hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -63,7 +63,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           <X className="h-4 w-4" />
         </button>
 
-        {/* Product Image Column */}
+
         <div className="relative aspect-square w-full bg-slate-100 md:aspect-auto md:w-1/2">
           <Image
             src={imageUrl || thumbnailImageUrl}
@@ -80,7 +80,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           )}
         </div>
 
-        {/* Product Details Column */}
+
         <div className="flex w-full flex-col justify-between p-6 md:w-1/2">
           <div className="space-y-4">
             <div>
@@ -97,7 +97,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               )}
             </div>
 
-            {/* Price section */}
+
             <div className="flex items-baseline gap-3">
               {isOnSale && numericMsrp > numericPrice ? (
                 <>
@@ -118,7 +118,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               )}
             </div>
 
-            {/* Custom attributes (Sizes / Colors) */}
+
             {color && color.length > 0 && (
               <div className="space-y-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -156,7 +156,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             )}
           </div>
 
-          {/* Action trigger */}
+
           <div className="mt-8">
             {isAdded ? (
               <div className="flex h-11 w-full items-center justify-between rounded-lg border border-border bg-muted/20">

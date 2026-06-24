@@ -13,21 +13,21 @@ const SearchBar = () => {
   const [inputValue, setInputValue] = useState("");
   const isUserTyping = useRef(false);
 
-  // Sync internal state when URL changes externally (or initial load)
+
   useEffect(() => {
     if (router.isReady) {
       setInputValue(urlQuery);
-      // If the URL query matches the input, we are fully in sync
+
       if (urlQuery === inputValue) {
         isUserTyping.current = false;
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [router.isReady, urlQuery]);
 
   const debouncedQuery = useDebounce(inputValue, 400);
 
-  // Push debounced value to URL
+
   useEffect(() => {
     if (!router.isReady || !isUserTyping.current) return;
 
@@ -37,7 +37,7 @@ const SearchBar = () => {
       } else {
         setUrlQuery(null);
       }
-      // Reset page when search changes
+
       setPage(null);
     }
   }, [debouncedQuery, urlQuery, router.isReady, setUrlQuery, setPage]);
