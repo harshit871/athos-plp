@@ -1,10 +1,10 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useQueryState, parseAsString, parseAsInteger } from "nuqs";
 import { searchProducts } from "@/services/searchspring";
 import { getActiveFilters } from "@/lib/filters";
-import type { SearchResponse } from "@/types";
+import type { SearchResponse, Product } from "@/types";
 
 export function usePlp() {
   const router = useRouter();
@@ -13,6 +13,31 @@ export function usePlp() {
   const [q] = useQueryState("q", parseAsString.withDefault(""));
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [sort] = useQueryState("sort", parseAsString.withDefault(""));
+
+  const [isInfiniteScroll, setIsInfiniteScroll] = useState(false);
+  const [accumulatedProducts, setAccumulatedProducts] = useState<Product[]>([]);
+  const [lastSort, setLastSort] = useState(sort);
+
+  // Load user preference for infinite scroll on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("athos_infinite_scroll");
+    if (saved) {
+      setIsInfiniteScroll(saved === "true");
+    }
+  }, []);
+
+  const toggleInfiniteScroll = (val: boolean) => {
+    setIsInfiniteScroll(val);
+    localStorage.setItem("athos_infinite_scroll", String(val));
+  };
+
+  // Reset page to 1 on sort change
+  useEffect(() => {
+    if (sort !== lastSort) {
+      setPage(1);
+      setLastSort(sort);
+    }
+  }, [sort, lastSort, setPage]);
 
   // Dynamic filters parsed from router query (parameters prefixed with "filter.")
   const filters = useMemo(() => {
@@ -44,6 +69,7 @@ export function usePlp() {
   // this effect automatically corrects the URL parameter back to 6.
   const apiCurrentPage = queryResult.data?.pagination?.currentPage;
   const apiTotalPages = queryResult.data?.pagination?.totalPages;
+  const totalPages = apiTotalPages ?? 1;
   const isPlaceholderData = queryResult.isPlaceholderData;
 
   useEffect(() => {
@@ -61,6 +87,25 @@ export function usePlp() {
     }
   }, [router.isReady, apiCurrentPage, apiTotalPages, page, setPage, isPlaceholderData]);
 
+  // Accumulate products for infinite scroll
+  useEffect(() => {
+    if (!queryResult.data || isPlaceholderData) return;
+
+    const newResults = queryResult.data.results ?? [];
+    const currentPage = queryResult.data.pagination?.currentPage ?? 1;
+
+    if (currentPage === 1) {
+      setAccumulatedProducts(newResults);
+    } else {
+      setAccumulatedProducts((prev) => {
+        // Avoid duplicates
+        const existingIds = new Set(prev.map((p) => p.id));
+        const filteredNew = newResults.filter((p) => !existingIds.has(p.id));
+        return [...prev, ...filteredNew];
+      });
+    }
+  }, [queryResult.data, q, sort, filters, isPlaceholderData]);
+
   return {
     data: queryResult.data,
     isLoading: queryResult.isLoading,
@@ -71,5 +116,14 @@ export function usePlp() {
     page,
     sort,
     filters,
+    isInfiniteScroll,
+    toggleInfiniteScroll,
+    infiniteProducts: accumulatedProducts,
+    hasMore: page < totalPages,
+    loadNextPage: () => {
+      if (!queryResult.isFetching && page < totalPages) {
+        setPage(page + 1);
+      }
+    },
   };
 }

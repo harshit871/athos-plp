@@ -184,7 +184,7 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className={`space-y-0 transition-opacity duration-200 ${isFetching ? "pointer-events-none opacity-65" : ""}`}>
+    <div className="space-y-0 transition-opacity duration-200">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 mb-2 border-b border-border">
         <div className="flex items-center gap-2">
@@ -236,8 +236,16 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
             : matchedValues.slice(0, DISPLAY_LIMIT);
           const hasMore = matchedValues.length > DISPLAY_LIMIT;
 
+          const isCategoryFacet = facet.field.toLowerCase().includes("category");
+          const isDisabled = isFetching && isCategoryFacet;
+
           return (
-            <div key={facet.field} className="py-4 first:pt-2">
+            <div
+              key={facet.field}
+              className={`py-4 first:pt-2 transition-opacity duration-200 ${
+                isDisabled ? "pointer-events-none opacity-50" : ""
+              }`}
+            >
               {/* Facet header / toggle */}
               <button
                 type="button"

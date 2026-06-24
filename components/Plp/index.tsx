@@ -8,7 +8,19 @@ import Header from "@/components/Plp/Header";
 
 const Plp = () => {
   const router = useRouter();
-  const { data, isLoading, isFetching, isError, refetch, filters } = usePlp();
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+    filters,
+    isInfiniteScroll,
+    toggleInfiniteScroll,
+    infiniteProducts,
+    loadNextPage,
+    hasMore,
+  } = usePlp();
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -62,6 +74,11 @@ const Plp = () => {
             isError={isError}
             refetch={refetch}
             onOpenFilters={() => setIsMobileFiltersOpen(true)}
+            isInfiniteScroll={isInfiniteScroll}
+            setIsInfiniteScroll={toggleInfiniteScroll}
+            infiniteProducts={infiniteProducts}
+            loadNextPage={loadNextPage}
+            hasMore={hasMore}
           />
         </main>
       </div>

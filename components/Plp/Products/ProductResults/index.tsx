@@ -1,15 +1,25 @@
 import type { Product } from "@/types";
 import ProductCard from "@/components/Plp/Products/ProductCard";
 import ProductGridSkeleton from "@/components/Plp/Products/ProductGridSkeleton";
+import ProductCardSkeleton from "@/components/Plp/Products/ProductCardSkeleton";
 
 interface ProductResultsProps {
   products: Product[] | undefined;
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
+  isInfiniteScroll?: boolean;
+  isFetching?: boolean;
 }
 
-const ProductResults = ({ products, isLoading, isError, refetch }: ProductResultsProps) => {
+const ProductResults = ({
+  products,
+  isLoading,
+  isError,
+  refetch,
+  isInfiniteScroll = false,
+  isFetching = false,
+}: ProductResultsProps) => {
   if (isLoading) {
     return <ProductGridSkeleton />;
   }
@@ -47,9 +57,16 @@ const ProductResults = ({ products, isLoading, isError, refetch }: ProductResult
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
+      {isInfiniteScroll && isFetching && (
+        <>
+          <ProductCardSkeleton />
+          <ProductCardSkeleton />
+          <ProductCardSkeleton />
+          <ProductCardSkeleton />
+        </>
+      )}
     </div>
   );
 };
 
 export default ProductResults;
-

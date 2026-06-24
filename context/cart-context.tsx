@@ -81,7 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart([]);
   };
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = cart.length;
 
   return (
     <CartContext.Provider
