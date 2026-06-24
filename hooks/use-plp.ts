@@ -35,6 +35,8 @@ export function usePlp() {
       ),
     enabled: router.isReady, // Wait for next/router to hydrate
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5, // Cache query data as fresh for 5 minutes
+    gcTime: 1000 * 60 * 10,   // Keep cache in memory for 10 minutes
   });
 
   // Keep pagination URL state in sync with the actual API response page.

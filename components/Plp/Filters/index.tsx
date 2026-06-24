@@ -243,7 +243,7 @@ const Filters = ({ facets, isLoading, activeFilters }: FiltersProps) => {
                 onClick={() =>
                   setCollapsed((prev) => ({ ...prev, [facet.field]: !prev[facet.field] }))
                 }
-                className="flex w-full items-center justify-between text-sm font-semibold text-foreground transition-colors hover:text-primary focus:outline-none"
+                className="flex w-full items-center justify-between text-sm font-semibold text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
                 aria-expanded={!isCollapsed}
               >
                 <span>{facet.label}</span>
@@ -295,7 +295,7 @@ const Filters = ({ facets, isLoading, activeFilters }: FiltersProps) => {
                               type="checkbox"
                               checked={checked}
                               onChange={() => toggleRange(facet.field, lo, hi)}
-                              className="h-4 w-4 shrink-0 rounded border-border accent-primary focus:ring-primary/20"
+                              className="h-4 w-4 shrink-0 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                             />
                             <span
                               className={
@@ -329,7 +329,7 @@ const Filters = ({ facets, isLoading, activeFilters }: FiltersProps) => {
                             type="checkbox"
                             checked={checked}
                             onChange={() => toggleValue(facet.field, val.value)}
-                            className="h-4 w-4 shrink-0 rounded border-border accent-primary focus:ring-primary/20"
+                            className="h-4 w-4 shrink-0 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                           />
                           <span
                             className={

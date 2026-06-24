@@ -24,7 +24,7 @@ const Plp = () => {
 
       <div className="flex flex-1 w-full">
         {/* Desktop sidebar */}
-        <aside className="hidden w-72 shrink-0 border-r border-border bg-card lg:block">
+        <aside className="hidden w-72 shrink-0 border-r border-border bg-card lg:block" aria-label="Filters Sidebar">
           <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
             {/*
               Pass isLoading (first-load only) to Filters — the skeleton shows only

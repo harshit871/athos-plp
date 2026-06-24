@@ -81,6 +81,7 @@ const Pagination = ({ pagination }: PaginationProps) => {
             }`}
             onClick={() => handlePageChange(p as number)}
             aria-current={isCurrent ? "page" : undefined}
+            aria-label={isCurrent ? `Current Page, Page ${p}` : `Go to page ${p}`}
           >
             {p}
           </Button>

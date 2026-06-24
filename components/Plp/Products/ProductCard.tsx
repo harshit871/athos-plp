@@ -1,21 +1,27 @@
+import React from "react";
 import Image from "next/image";
 import type { Product } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/cart-context";
-import { Plus } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
-  const { name, imageUrl, thumbnailImageUrl, brand, price, msrp, on_sale } = product;
-  const { addToCart } = useCart();
+const ProductCard = React.memo(({ product }: ProductCardProps) => {
+  const { name, imageUrl, thumbnailImageUrl, brand, price, msrp, on_sale } =
+    product;
+  const { cart, addToCart } = useCart();
 
   const numericPrice = parseFloat(price) || 0;
   const numericMsrp = parseFloat(msrp) || 0;
   const isOnSale = on_sale?.[0] === "Yes" || numericMsrp > numericPrice;
+
+  const cartItem = cart.find((item) => item.product.id === product.id);
+  const quantityInCart = cartItem?.quantity ?? 0;
+  const isAdded = quantityInCart > 0;
 
   return (
     <Card className="group relative flex cursor-pointer flex-col overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-lg">
@@ -57,22 +63,38 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </div>
 
-        <div className="mt-2.5 overflow-hidden">
+        <div className="mt-auto overflow-hidden">
           <Button
             size="sm"
-            className="w-full gap-1.5 transition-all duration-300 transform translate-y-0 opacity-100 lg:translate-y-2 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
+            variant={isAdded ? "secondary" : "default"}
+            className={`w-full gap-1.5 transition-all duration-300 ${
+              isAdded
+                ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-500/50"
+                : ""
+            }`}
             onClick={(e) => {
               e.stopPropagation();
               addToCart(product);
             }}
           >
-            <Plus className="h-3.5 w-3.5" />
-            Add to Cart
+            {isAdded ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                Added to Cart ({quantityInCart})
+              </>
+            ) : (
+              <>
+                <Plus className="h-3.5 w-3.5" />
+                Add to Cart
+              </>
+            )}
           </Button>
         </div>
       </CardContent>
     </Card>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
 
 export default ProductCard;
