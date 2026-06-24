@@ -12,6 +12,7 @@ const Plp = () => {
     data,
     isLoading,
     isFetching,
+    isFetchingNewQuery,
     isError,
     refetch,
     filters,
@@ -71,6 +72,7 @@ const Plp = () => {
             data={data}
             isLoading={initialLoading}
             isFetching={isFetching}
+            isFetchingNewQuery={isFetchingNewQuery}
             isError={isError}
             refetch={refetch}
             onOpenFilters={() => setIsMobileFiltersOpen(true)}

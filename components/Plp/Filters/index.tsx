@@ -300,12 +300,23 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                             key={val.label}
                             className="flex cursor-pointer select-none items-center gap-2.5 text-xs"
                           >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleRange(facet.field, lo, hi)}
-                              className="h-4 w-4 shrink-0 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                            />
+                            <div className="relative flex h-4 w-4 shrink-0 items-center justify-center">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleRange(facet.field, lo, hi)}
+                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-sm border border-zinc-300 bg-background transition-all hover:border-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 checked:border-primary checked:bg-primary dark:border-zinc-700 dark:hover:border-zinc-600"
+                              />
+                              <svg
+                                className="pointer-events-none absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
                             <span
                               className={
                                 checked
@@ -334,12 +345,23 @@ const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps)
                           key={val.value || val.label}
                           className="flex cursor-pointer select-none items-center gap-2.5 text-xs"
                         >
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => toggleValue(facet.field, val.value)}
-                            className="h-4 w-4 shrink-0 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                          />
+                          <div className="relative flex h-4 w-4 shrink-0 items-center justify-center">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleValue(facet.field, val.value)}
+                              className="peer h-4 w-4 cursor-pointer appearance-none rounded-sm border border-zinc-300 bg-background transition-all hover:border-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 checked:border-primary checked:bg-primary dark:border-zinc-700 dark:hover:border-zinc-600"
+                            />
+                            <svg
+                              className="pointer-events-none absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={3}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
                           <span
                             className={
                               checked

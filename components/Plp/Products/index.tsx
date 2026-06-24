@@ -11,6 +11,7 @@ interface ProductsProps {
   data: SearchResponse | undefined;
   isLoading: boolean;
   isFetching: boolean;
+  isFetchingNewQuery: boolean;
   isError: boolean;
   refetch: () => void;
   onOpenFilters: () => void;
@@ -25,6 +26,7 @@ const Products = ({
   data,
   isLoading,
   isFetching,
+  isFetchingNewQuery,
   isError,
   refetch,
   onOpenFilters,
@@ -45,7 +47,7 @@ const Products = ({
           loadNextPage();
         }
       },
-      { rootMargin: "200px" } // Load next page slightly before reaching the bottom
+      { rootMargin: "200px" }, // Load next page slightly before reaching the bottom
     );
 
     const currentRef = loadMoreRef.current;
@@ -80,26 +82,28 @@ const Products = ({
                 {begin}–{end} of {totalResults}
               </span>
             )}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-end gap-3 sm:gap-4">
               {/* Infinite Scroll Toggle */}
               <div className="flex items-center gap-2 pr-1 select-none">
                 <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
-                  Infinite Scroll: <span className={isInfiniteScroll ? "text-primary font-bold" : "text-muted-foreground font-bold"}>{isInfiniteScroll ? "ON" : "OFF"}</span>
+                  Infinite Scroll
                 </span>
                 <button
                   role="switch"
                   aria-checked={isInfiniteScroll}
                   onClick={() => setIsInfiniteScroll(!isInfiniteScroll)}
-                  className={`relative inline-flex h-5.5 w-10 shrink-0 cursor-pointer items-center rounded-full border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                    isInfiniteScroll 
-                      ? "bg-primary border-primary" 
-                      : "bg-zinc-200 border-zinc-300 dark:bg-zinc-800 dark:border-zinc-700"
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    isInfiniteScroll
+                      ? "bg-green-200 border-primary shadow-sm"
+                      : "bg-muted border-border hover:bg-muted/80"
                   }`}
                   aria-label="Toggle Infinite Scroll"
                 >
                   <span
-                    className={`pointer-events-none block h-4.5 w-4.5 rounded-full bg-background shadow-md transition-transform duration-200 ${
-                      isInfiniteScroll ? "translate-x-5" : "translate-x-0.5"
+                    className={`pointer-events-none block h-4.5 w-4.5 rounded-full shadow-md transition-all duration-200 ${
+                      isInfiniteScroll
+                        ? "translate-x-5 bg-green-500"
+                        : "translate-x-0.5 bg-zinc-400"
                     }`}
                   />
                 </button>
@@ -130,12 +134,14 @@ const Products = ({
       */}
       <div
         className={
-          !isInfiniteScroll && isFetching && !isLoading ? "transition-opacity duration-200 opacity-50" : ""
+          !isInfiniteScroll && isFetching && !isLoading && !isFetchingNewQuery
+            ? "transition-opacity duration-200 opacity-50"
+            : ""
         }
       >
         <ProductResults
           products={isInfiniteScroll ? infiniteProducts : data?.results}
-          isLoading={isLoading}
+          isLoading={isLoading || isFetchingNewQuery}
           isError={isError}
           refetch={refetch}
           isInfiniteScroll={isInfiniteScroll}
@@ -144,12 +150,17 @@ const Products = ({
       </div>
 
       {isInfiniteScroll && hasMore && !isLoading && !isError && (
-        <div ref={loadMoreRef} className="h-10 w-full flex items-center justify-center py-4">
+        <div
+          ref={loadMoreRef}
+          className="h-10 w-full flex items-center justify-center py-4"
+        >
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       )}
 
-      {!isInfiniteScroll && !isLoading && !isError && <Pagination pagination={pagination} />}
+      {!isInfiniteScroll && !isLoading && !isError && (
+        <Pagination pagination={pagination} />
+      )}
     </div>
   );
 };

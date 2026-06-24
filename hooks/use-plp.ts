@@ -110,6 +110,7 @@ export function usePlp() {
     data: queryResult.data,
     isLoading: queryResult.isLoading,
     isFetching: queryResult.isFetching,
+    isFetchingNewQuery: isPlaceholderData && page === 1,
     isError: queryResult.isError,
     refetch: queryResult.refetch,
     q,

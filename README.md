@@ -27,10 +27,10 @@ athos-plp/
 │   └── cart-context.tsx  # Global state manager for local storage-persisted cart
 ├── hooks/
 │   ├── use-debounce.ts   # Custom hook for search-typing delay
-│   └── use-plp.ts        # Main data logic controller hook (facets, queries, clamping)
+│   └── use-plp.ts        # Core controller: fetches data, syncs URL params, and manages infinite scroll accumulation
 ├── lib/
 │   ├── utils.ts          # Styling class-name merger helpers
-│   └── filters.ts        # Dynamic URL query parse utilities
+│   └── filters.ts        # Parses active filters from the URL query strings
 ├── services/
 │   └── searchspring.ts   # Client wrapper for the Searchspring Search API
 ├── pages/
@@ -65,8 +65,9 @@ athos-plp/
 ## 4. Tradeoffs / Assumptions
 
 * **Client-Side Cart:** The cart is maintained on the client using `localStorage`. SSR hydration warnings are prevented by deferring state synchronization until after the client mounts (`useEffect` inside the `CartProvider`).
-* **Category Hierarchy:** The Category facet works on hierarchy rules. Clicking a subcategory category queries Searchspring which drill-downs. Once a leaf category (with no further nested categories) is selected, the Category facet values array is empty and shows "No matches found".
-* **Filter Locking:** To avoid query race conditions and conflicting API state merges, the filters sidebar gets locked (`pointer-events-none opacity-65`) while a background query fetch is running.
+* **Infinite Scroll vs Pagination:** Both are supported. When Infinite Scroll is enabled, `use-plp.ts` accumulates product results in local state. Standard pagination relies purely on the URL `page` parameter.
+* **Loading States (Skeletons):** Full skeleton grids are shown on the initial load and when executing a *new* search or filter query. Standard page changes use a subtle 50% opacity transition to avoid layout shift. Infinite scroll appends skeleton cards at the bottom.
+* **Localized Filter Locking:** To prevent users from selecting conflicting sub-category facets while a fetch is in progress, only the category-related facets are locked (`pointer-events-none opacity-50`). Other facets remain interactive.
 
 ---
 
