@@ -1,4 +1,4 @@
-import { SearchResponse } from "../types";
+import type { SearchResponse } from "@/types";
 
 export interface SearchParams {
   q?: string;

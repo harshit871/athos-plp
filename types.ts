@@ -46,7 +46,7 @@ export interface FacetValue {
 export interface Facet {
   field: string;
   label: string;
-  type: "value" | "range" | "slider";
+  type: string;
   collapse: number;
   facet_active: number;
   values: FacetValue[];

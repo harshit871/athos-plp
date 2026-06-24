@@ -1,24 +1,36 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useQueryState, parseAsString } from "nuqs";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useRouter } from "next/router";
 
 const SearchBar = () => {
+  const router = useRouter();
   const [urlQuery, setUrlQuery] = useQueryState("q", parseAsString.withDefault(""));
   const [, setPage] = useQueryState("page", parseAsString);
   
-  const [inputValue, setInputValue] = useState(urlQuery);
+  const [inputValue, setInputValue] = useState("");
+  const isUserTyping = useRef(false);
 
-  // Sync internal state when URL changes externally
+  // Sync internal state when URL changes externally (or initial load)
   useEffect(() => {
-    setInputValue(urlQuery);
-  }, [urlQuery]);
+    if (router.isReady) {
+      setInputValue(urlQuery);
+      // If the URL query matches the input, we are fully in sync
+      if (urlQuery === inputValue) {
+        isUserTyping.current = false;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, urlQuery]);
 
   const debouncedQuery = useDebounce(inputValue, 400);
 
   // Push debounced value to URL
   useEffect(() => {
+    if (!router.isReady || !isUserTyping.current) return;
+
     if (debouncedQuery !== urlQuery) {
       if (debouncedQuery) {
         setUrlQuery(debouncedQuery);
@@ -28,7 +40,12 @@ const SearchBar = () => {
       // Reset page when search changes
       setPage(null);
     }
-  }, [debouncedQuery, urlQuery, setUrlQuery, setPage]);
+  }, [debouncedQuery, urlQuery, router.isReady, setUrlQuery, setPage]);
+
+  const handleInputChange = (value: string) => {
+    isUserTyping.current = true;
+    setInputValue(value);
+  };
 
   return (
     <div className="w-full space-y-2">
@@ -40,7 +57,7 @@ const SearchBar = () => {
           placeholder="Search Products"
           type="search"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => handleInputChange(e.target.value)}
         />
       </div>
     </div>
@@ -48,3 +65,4 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
+
