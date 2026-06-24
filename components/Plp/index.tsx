@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { usePlp } from "@/hooks/use-plp";
 import Filters from "@/components/Plp/Filters";
 import Products from "@/components/Plp/Products";
+import Header from "@/components/Plp/Header";
 
 const Plp = () => {
   const router = useRouter();
@@ -18,22 +19,25 @@ const Plp = () => {
   }, [router.events]);
 
   return (
-    <div className="flex min-h-screen w-full bg-background text-foreground">
-      {/* Desktop sidebar */}
-      <aside className="hidden w-72 shrink-0 border-r border-border bg-card lg:block">
-        <div className="sticky top-0 h-screen overflow-y-auto p-6">
-          {/*
-            Pass isLoading (first-load only) to Filters — the skeleton shows only
-            when there are no cached facets yet. During refetches the sidebar
-            stays intact so accordion state is preserved.
-          */}
-          <Filters
-            facets={data?.facets ?? []}
-            isLoading={isLoading}
-            activeFilters={filters}
-          />
-        </div>
-      </aside>
+    <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+      <Header />
+
+      <div className="flex flex-1 w-full">
+        {/* Desktop sidebar */}
+        <aside className="hidden w-72 shrink-0 border-r border-border bg-card lg:block">
+          <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+            {/*
+              Pass isLoading (first-load only) to Filters — the skeleton shows only
+              when there are no cached facets yet. During refetches the sidebar
+              stays intact so accordion state is preserved.
+            */}
+            <Filters
+              facets={data?.facets ?? []}
+              isLoading={isLoading}
+              activeFilters={filters}
+            />
+          </div>
+        </aside>
 
       {/* Main content */}
       <main className="flex-1 min-w-0 p-6 lg:p-8">
@@ -52,6 +56,7 @@ const Plp = () => {
           onOpenFilters={() => setIsMobileFiltersOpen(true)}
         />
       </main>
+      </div>
 
       {/* Mobile filter drawer */}
       {isMobileFiltersOpen && (

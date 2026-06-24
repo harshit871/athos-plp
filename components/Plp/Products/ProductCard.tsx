@@ -1,6 +1,9 @@
 import Image from "next/image";
 import type { Product } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/context/cart-context";
+import { Plus } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -8,6 +11,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { name, imageUrl, thumbnailImageUrl, brand, price, msrp, on_sale } = product;
+  const { addToCart } = useCart();
 
   const numericPrice = parseFloat(price) || 0;
   const numericMsrp = parseFloat(msrp) || 0;
@@ -51,6 +55,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
               ${numericPrice.toFixed(2)}
             </span>
           )}
+        </div>
+
+        <div className="mt-2.5 overflow-hidden">
+          <Button
+            size="sm"
+            className="w-full gap-1.5 transition-all duration-300 transform translate-y-0 opacity-100 lg:translate-y-2 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product);
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add to Cart
+          </Button>
         </div>
       </CardContent>
     </Card>

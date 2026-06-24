@@ -74,7 +74,11 @@ const Pagination = ({ pagination }: PaginationProps) => {
           <Button
             key={`page-${p}`}
             variant={isCurrent ? "default" : "outline"}
-            className="size-8"
+            className={`size-8 transition-all duration-200 ${
+              isCurrent
+                ? "bg-foreground text-background font-extrabold shadow-md border-foreground ring-2 ring-foreground/20 scale-110 hover:bg-foreground/90"
+                : "hover:scale-105"
+            }`}
             onClick={() => handlePageChange(p as number)}
             aria-current={isCurrent ? "page" : undefined}
           >
