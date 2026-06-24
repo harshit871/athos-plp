@@ -10,6 +10,11 @@ const Plp = () => {
   const router = useRouter();
   const { data, isLoading, isFetching, isError, refetch, filters } = usePlp();
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close the mobile drawer whenever a shallow navigation completes (filter click)
   useEffect(() => {
@@ -17,6 +22,8 @@ const Plp = () => {
     router.events.on("routeChangeComplete", handleRouteChange);
     return () => router.events.off("routeChangeComplete", handleRouteChange);
   }, [router.events]);
+
+  const initialLoading = !isMounted || isLoading;
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
@@ -33,29 +40,30 @@ const Plp = () => {
             */}
             <Filters
               facets={data?.facets ?? []}
-              isLoading={isLoading}
+              isLoading={initialLoading}
+              isFetching={isFetching}
               activeFilters={filters}
             />
           </div>
         </aside>
 
-      {/* Main content */}
-      <main className="flex-1 min-w-0 p-6 lg:p-8">
-        {/*
-          isFetching covers both first-load and background refetches.
-          isLoading is true only when there is no cached data at all.
-          Products uses isFetching for a subtle opacity transition on the grid
-          so the skeleton shows only on the very first render.
-        */}
-        <Products
-          data={data}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          isError={isError}
-          refetch={refetch}
-          onOpenFilters={() => setIsMobileFiltersOpen(true)}
-        />
-      </main>
+        {/* Main content */}
+        <main className="flex-1 min-w-0 p-6 lg:p-8">
+          {/*
+            isFetching covers both first-load and background refetches.
+            isLoading is true only when there is no cached data at all.
+            Products uses isFetching for a subtle opacity transition on the grid
+            so the skeleton shows only on the very first render.
+          */}
+          <Products
+            data={data}
+            isLoading={initialLoading}
+            isFetching={isFetching}
+            isError={isError}
+            refetch={refetch}
+            onOpenFilters={() => setIsMobileFiltersOpen(true)}
+          />
+        </main>
       </div>
 
       {/* Mobile filter drawer */}
@@ -63,7 +71,7 @@ const Plp = () => {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-white/70 backdrop-blur-sm"
             onClick={() => setIsMobileFiltersOpen(false)}
             aria-hidden="true"
           />
@@ -82,7 +90,8 @@ const Plp = () => {
             <div className="flex-1 overflow-y-auto px-5 py-4">
               <Filters
                 facets={data?.facets ?? []}
-                isLoading={isLoading}
+                isLoading={initialLoading}
+                isFetching={isFetching}
                 activeFilters={filters}
               />
             </div>

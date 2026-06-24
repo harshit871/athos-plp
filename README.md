@@ -1,40 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Searchspring Product Listing Page (PLP)
 
-## Getting Started
+A production-quality Product Listing Page (PLP) built in Next.js (Pages Router) featuring real-time faceted search, debounced text search, URL state persistence, persistent shopping cart actions, and high-performance caching.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 1. Tech Stack Choices
+
+* **Core Framework:** Next.js 13.5 (Pages Router) with TypeScript & React 18.
+* **Server State & Caching:** `@tanstack/react-query` (TanStack Query v5) for request caching, automatic background fetching, and preventing race conditions.
+* **URL State Management:** `nuqs` (formerly `next-usequerystate`) to synchronize the search query, pagination, and sorting directly to browser URL parameters.
+* **Styling & Components:** Tailwind CSS (v4) with custom components leveraging Radix UI primitives and Lucide React icons.
+
+---
+
+## 2. Architecture Overview
+
+```txt
+athos-plp/
+├── components/
+│   ├── ui/               # Reusable UI primitives (Button, Card, Input)
+│   └── Plp/
+│       ├── Header.tsx    # Sticky header with cart badge icon
+│       ├── Filters/      # Facet accordion sidebar with search and filter locks
+│       └── Products/     # Product grid, searchbar, sort dropdown, and pagination
+├── context/
+│   └── cart-context.tsx  # Global state manager for local storage-persisted cart
+├── hooks/
+│   ├── use-debounce.ts   # Custom hook for search-typing delay
+│   └── use-plp.ts        # Main data logic controller hook (facets, queries, clamping)
+├── lib/
+│   ├── utils.ts          # Styling class-name merger helpers
+│   └── filters.ts        # Dynamic URL query parse utilities
+├── services/
+│   └── searchspring.ts   # Client wrapper for the Searchspring Search API
+├── pages/
+│   ├── _app.tsx          # Query Client and Cart Provider mount wrapper
+│   └── index.tsx         # Main entry point rendering the PLP view
+├── types.ts              # TypeScript definitions for facets, products, pagination
+└── implementation.md     # Phase checklist and requirements
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## 3. Setup Instructions
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+2. **Run in Development Mode:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+3. **Production Build & Verification:**
+   ```bash
+   npm run build
+   ```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 4. Tradeoffs / Assumptions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **Client-Side Cart:** The cart is maintained on the client using `localStorage`. SSR hydration warnings are prevented by deferring state synchronization until after the client mounts (`useEffect` inside the `CartProvider`).
+* **Category Hierarchy:** The Category facet works on hierarchy rules. Clicking a subcategory category queries Searchspring which drill-downs. Once a leaf category (with no further nested categories) is selected, the Category facet values array is empty and shows "No matches found".
+* **Filter Locking:** To avoid query race conditions and conflicting API state merges, the filters sidebar gets locked (`pointer-events-none opacity-65`) while a background query fetch is running.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 5. Performance Considerations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* **Query Caching:** TanStack Query is configured with `staleTime: 5 mins` and `gcTime: 10 mins`. Navigating back and forth or toggling the same checkbox works instantly by serving cached data.
+* **Memoization:** The `ProductCard` component is wrapped in `React.memo` to skip redundant reconciliation when unrelated PLP elements (like the filter drawer) update.
+* **Refetch Persistence:** The hook configures `placeholderData: keepPreviousData` to keep current facets visible and prevent layout layout flashes when query keys shift.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
+
+## 6. Future Improvements
+
+* **Cart Drawer UI:** Add a slide-out panel to view, modify quantities, and clear items from the cart.
+* **SSR Prefetching:** Prefetch the initial PLP query server-side inside `getServerSideProps` to serve indexable SEO markup out-of-the-box.
+* **E2E Playwright Tests:** Implement automated visual and functional testing for desktop hover interactions, pagination clamping, and filter selections.

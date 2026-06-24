@@ -9,12 +9,13 @@ interface FiltersProps {
   facets: Facet[];
   // true only on the very first load — no cached data yet
   isLoading: boolean;
+  isFetching: boolean;
   activeFilters: Record<string, string[]>;
 }
 
 const DISPLAY_LIMIT = 5;
 
-const Filters = ({ facets, isLoading, activeFilters }: FiltersProps) => {
+const Filters = ({ facets, isLoading, isFetching, activeFilters }: FiltersProps) => {
   const router = useRouter();
 
   // Expand/collapse per facet — all open by default
@@ -183,7 +184,7 @@ const Filters = ({ facets, isLoading, activeFilters }: FiltersProps) => {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-0">
+    <div className={`space-y-0 transition-opacity duration-200 ${isFetching ? "pointer-events-none opacity-65" : ""}`}>
       {/* Header */}
       <div className="flex items-center justify-between pb-4 mb-2 border-b border-border">
         <div className="flex items-center gap-2">

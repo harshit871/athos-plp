@@ -9,6 +9,7 @@ export interface CartItem {
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   totalItems: number;
@@ -54,6 +55,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const updateQuantity = (productId: string, quantity: number) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.product.id === productId);
+      if (!existingItem) return prevCart;
+
+      // Avoid rendering/write updates if the target quantity is identical
+      if (existingItem.quantity === quantity) return prevCart;
+
+      if (quantity <= 0) {
+        return prevCart.filter((item) => item.product.id !== productId);
+      }
+
+      return prevCart.map((item) =>
+        item.product.id === productId ? { ...item, quantity } : item
+      );
+    });
+  };
+
   const removeFromCart = (productId: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
   };
@@ -69,6 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         cart,
         addToCart,
+        updateQuantity,
         removeFromCart,
         clearCart,
         totalItems,
