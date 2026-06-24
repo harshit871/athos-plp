@@ -1,12 +1,21 @@
-import Filters from "./Filters";
-import Products from "./Products";
+import Filters from "@/components/Plp/Filters";
+import Products from "@/components/Plp/Products";
 
 const Plp = () => {
   return (
-    <section className="grid grid-cols-[3fr_7fr] gap-2 p-4">
-      <Filters />
-      <Products />
-    </section>
+    <div className="flex min-h-screen w-full bg-background">
+      {/* Sidebar */}
+      <aside className="hidden w-64 shrink-0 border-r lg:block">
+        <div className="sticky top-0 h-screen overflow-y-auto p-6">
+          <Filters />
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 min-w-0 p-6">
+        <Products />
+      </main>
+    </div>
   );
 };
 
